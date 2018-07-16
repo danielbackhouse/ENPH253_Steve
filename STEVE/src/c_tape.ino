@@ -14,54 +14,10 @@
 // }
 
 void pid(){
-    read_sensor_values();
     calculate_pid();
     motor_control();
 }
 
-void read_sensor_values() {
-
-
-  //negative PID_value <-- left motor speed increase, right motor speed decrease
-  //positive PID_value <-- right motor speed increase, left motor speed decrease
-
-  int digitalLeft = 1;
-  int digitalRight = 1;
-  int left_qrd = analogRead(LEFT_QRD);
-  int right_qrd = analogRead(RIGHT_QRD);
-  if(left_qrd < QRD_TRHESHOLD_TAPE){
-    digitalLeft = 0;
-  }
-  if(right_qrd < QRD_TRHESHOLD_TAPE){
-    digitalRight = 0;
-  }
-  //concating sensor readings together
-  int readings = digitalLeft * 10 + digitalRight;
-  if (readings != 0)
-    previous = readings;
-  
-  switch (readings) {
-
-    case 1:
-      error = 1;
-      break;
-    case 11:
-      error = 0;
-      break;
-
-    case 10:
-      error = -1;
-      break;
-    case 0:
-      if (previous == 1) 
-        error = 4;
-      else if (previous == 10)
-        error = -4;
-      else
-        error = 0;
-       break;
-  }
- }
 
   void calculate_pid() {
 

@@ -6,15 +6,27 @@
 #include <EEPROM.h>
 
 
-#define left_mb PB0 //define motor inputs
-#define left_mf PB1
-#define right_mb PA7
-#define right_mf PA6
+#define left_mb PA3 //define motor inputs
+#define left_mf PA2
+#define right_mb PA1
+#define right_mf PA0
 
-#define RIGHT_QRD PA8
-#define LEFT_QRD PA9
+#define INITIAL_RIGHT_QRD PB0
+#define INITIAL_LEFT_QRD PB1
+#define MIDDLE_RIGHT_QRD PA6
+#define MIDDLE_LEFT_QRD PA7
+#define EDGE_DETECT PA5 //A4 sucks
 
-#define max_PWM 65535
+#define RIGHT_CLAW PB3
+#define LEFT_CLAW PA4
+
+enum States{
+  Check, FirstEwok, FirstGap, SecondEwok, IR, ThirdEwok, Dump, Stop, TestInitial, TestSecond
+  };
+
+int state = Check;
+
+#define max_PWM 65500
 
 int left_qrd = 0;
 int right_qrd = 0;
@@ -23,11 +35,20 @@ int selected = 0;
 int counter = 0;
 
 
-#define QRD_TRHESHOLD_TAPE 300  //analog readings above 300 if line detected 
+#define QRD_TRHESHOLD_TAPE 1000  //analog readings below 1000 if line detected 
+#define EDGE_THRESHOLD 1000
 
 //adjustable constants for PID-tape
-float Kp = 30 , Ki = 0.5, Kd = 67, gain = 1;
-float initial_motor_speed =  50000;
+float Kp = 0 , Ki = 0, Kd = 0, gain = 0;
+float initial_motor_speed =  30000;
+
+//Adjustable constants for the initial tape following
+float i_Kp = 30, i_Ki = 0.1, i_Kd = 60, i_gain = 80;
+float i_initial_motor_speed = 29000;
+
+//Adjustable constants for the secondary tape following
+float s_Kp = 30, s_Ki = 0.1, s_Kd = 60, s_gain = 80;
+float s_initial_motor_speed = 29000;
 //Global variables for PID-Tape
 float error = 0, P = 0, I = 0, D = 0, PID_value = 0;
 float previous_error = 0, previous_I = 0;
@@ -46,6 +67,7 @@ Adafruit_SSD1306 display(OLED_RESET);
 #define YPOS 1
 #define DELTAY 2
 
+
 bool changing = false;
 bool show_display = false;
 bool showing_display  = false;
@@ -53,9 +75,9 @@ bool new_screen = false;
 int var_selected = 0;
 int menu_level = 0;
 int num_menu_items = 1;
-#define select_button PA2
-#define up_button PA4
-#define down_button PA3
+#define select_button PB5
+#define up_button PB3
+#define down_button PB4
 #define LOGO16_GLCD_HEIGHT 16 
 #define LOGO16_GLCD_WIDTH  16 
 static const unsigned char PROGMEM logo16_glcd_bmp[] =
@@ -92,21 +114,52 @@ void setup() {
     pinMode(left_mf, PWM);
     pinMode(right_mb, PWM);
     pinMode(right_mf, PWM);
-    pinMode(LEFT_QRD, INPUT);
-    pinMode(RIGHT_QRD, INPUT);
+    pinMode(INITIAL_LEFT_QRD, INPUT);
+    pinMode(INITIAL_RIGHT_QRD, INPUT);
+    pinMode(MIDDLE_RIGHT_QRD, INPUT);
+    pinMode(MIDDLE_LEFT_QRD, INPUT);
+    pinMode(EDGE_DETECT, INPUT);
+    pinMode(RIGHT_CLAW, INPUT_PULLUP);
+    pinMode(LEFT_CLAW, INPUT_PULLUP);
+
   pinMode(up_button, INPUT_PULLUP);
   pinMode(down_button, INPUT_PULLUP);
   pinMode(select_button, INPUT_PULLUP);
+  digitalWrite(LED_BUILTIN, LOW);
     led_init();
-    digitalWrite(LED_BUILTIN, HIGH);
+   // digitalWrite(LED_BUILTIN, HIGH);
 }
 
 void loop() {
-    pid();
+    switch (state){
+      case Check:
+        check();
+        delay(1000);
+        digitalWrite(LED_BUILTIN, HIGH);
+        break;
+      case FirstEwok:
+        sensors(FirstEwok);
+        pid();
+        break;
+      case Stop:
+        end_moving();
+        break;
+      case TestInitial:
+        test_initial();
+        break;
+      case TestSecond:
+        test_second();
+        break;
+      default:
+        end_moving();
+        break;
+
+
+    }
      if(!showing_display){
          show_display = !digitalRead(select_button);
          if(show_display)
-            delay(200);
+            delay(100);
      }
      if(show_display || showing_display){
        showing_display = true;
@@ -118,8 +171,14 @@ void loop() {
 
 void end_moving(){
         pwmWrite(left_mf, 0);
-        pwmWrite(left_mf, 0);
+        pwmWrite(left_mb, 0);
     
         pwmWrite(right_mb, 0);
         pwmWrite(right_mf, 0);
+}
+
+void check(){
+  state = FirstEwok;
+  Kp = i_Kp, Kd = i_Kd, Ki = i_Ki, gain = i_gain;
+  initial_motor_speed = i_initial_motor_speed;
 }
