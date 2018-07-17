@@ -17,7 +17,7 @@ void sensors(States stat){
 void stop_sensors(States stat){
     switch(stat){
         case FirstEwok:
-        if(!digitalRead(RIGHT_CLAW)){
+        if(digitalRead(RIGHT_CLAW)){
 
             end_moving();
             //right_claw_grab();
