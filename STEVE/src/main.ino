@@ -17,8 +17,8 @@
 #define MIDDLE_LEFT_QRD PA7
 #define EDGE_DETECT PA5 //A4 sucks
 
-#define RIGHT_CLAW PB3
-#define LEFT_CLAW PA4
+#define RIGHT_CLAW PB8
+#define LEFT_CLAW PB9
 
 enum States{
   Check, FirstEwok, FirstGap, SecondEwok, IR, ThirdEwok, Dump, Stop, TestInitial, TestSecond
@@ -40,15 +40,15 @@ int counter = 0;
 
 //adjustable constants for PID-tape
 float Kp = 0 , Ki = 0, Kd = 0, gain = 0;
-float initial_motor_speed =  30000;
+float initial_motor_speed =  0;
 
 //Adjustable constants for the initial tape following
-float i_Kp = 30, i_Ki = 0.1, i_Kd = 60, i_gain = 80;
-float i_initial_motor_speed = 29000;
+float i_Kp = 100, i_Ki = 0, i_Kd = 0, i_gain = 100;
+float i_initial_motor_speed = 25000;
 
 //Adjustable constants for the secondary tape following
-float s_Kp = 30, s_Ki = 0.1, s_Kd = 60, s_gain = 80;
-float s_initial_motor_speed = 29000;
+float s_Kp = 100, s_Ki = 0, s_Kd = 0, s_gain = 100;
+float s_initial_motor_speed = 25000;
 //Global variables for PID-Tape
 float error = 0, P = 0, I = 0, D = 0, PID_value = 0;
 float previous_error = 0, previous_I = 0;
@@ -108,7 +108,7 @@ void setup() {
     EEPROM.PageBase0 = 0x801F000;
     EEPROM.PageBase1 = 0x801F800;
     EEPROM.PageSize  = 0x400;
-    Serial.begin(115200);
+    Serial1.begin(9600);
     pinMode(LED_BUILTIN, OUTPUT);
     pinMode(left_mb, PWM);
     pinMode(left_mf, PWM);
@@ -126,11 +126,13 @@ void setup() {
   pinMode(down_button, INPUT_PULLUP);
   pinMode(select_button, INPUT_PULLUP);
   digitalWrite(LED_BUILTIN, LOW);
-    led_init();
+  led_init();
    // digitalWrite(LED_BUILTIN, HIGH);
+  // Serial1.println("JAfd");
 }
 
 void loop() {
+
     switch (state){
       case Check:
         check();

@@ -161,7 +161,6 @@ void led_display(){
         delay(50);
     }
     else if(!digitalRead(up_button)){
-        Serial.println("hey");
         var_selected--;
         new_screen = true;
         delay(20);
@@ -259,8 +258,6 @@ void led_display(){
 }
 void changeVal(float *val, char name[],float change){
     float thisVal = *val;
-    Serial.println(thisVal);
-    Serial.println(name);
     display.clearDisplay();
     display.setTextSize(1);
     display.setTextColor(WHITE);
@@ -380,7 +377,6 @@ void save(){
                 delay(500);
             }
             else if(!digitalRead(up_button)){
-                Serial.println("hey");
                 var_selected--;
                 new_screen = true;
                 delay(20);
@@ -504,7 +500,6 @@ void load(){
                 delay(200);
             }
             else if(!digitalRead(up_button)){
-                Serial.println("hey");
                 var_selected--;
                 new_screen = true;
                 delay(20);

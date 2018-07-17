@@ -35,7 +35,6 @@ void pid(){
 //  Serial.print("\n");
 //  Serial.print(PID_value);
 
-
   PID_value = gain*((Kp * P) + (Ki * I) + (Kd * D));
 
   previous_error = error;
@@ -49,6 +48,7 @@ void motor_control() {
   bool l_forward = true;
   bool r_forward = true; 
   
+ // Serial1.println(left_motor_speed);
 
   if(left_motor_speed < 0){
       left_motor_speed = -left_motor_speed;
@@ -57,7 +57,7 @@ void motor_control() {
   if (left_motor_speed > max_PWM){
     left_motor_speed = max_PWM;
   }
-  if(left_motor_speed < 0){
+  if(right_motor_speed < 0){
     right_motor_speed = -right_motor_speed;
     r_forward = false;
   }
@@ -66,21 +66,28 @@ void motor_control() {
   }
 
   
+ // delay(100);
   //give motor its speed
     if(l_forward == true){
         pwmWrite(left_mf, left_motor_speed);
         pwmWrite(left_mb, 0);
+        // Serial1.print(left_motor_speed);
+        // Serial1.println(" left");
     }
     else{
         pwmWrite(left_mb, left_motor_speed);
         pwmWrite(left_mf, 0);
+        
     }
     if(r_forward == true){
         pwmWrite(right_mf, right_motor_speed);
         pwmWrite(right_mb, 0);
+        // Serial1.print(right_motor_speed);
+        // Serial1.println(" right");
     }
     else{
         pwmWrite(right_mb, right_motor_speed);
         pwmWrite(right_mf, 0);
+        
     }
 }
