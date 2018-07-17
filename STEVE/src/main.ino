@@ -9,7 +9,6 @@
 TwoWire WIRE2 (2,I2C_FAST_MODE);
 #define Wire WIRE2
 
-
 #define left_mb PA3 //define motor inputs
 #define left_mf PA2
 #define right_mb PA1
@@ -40,14 +39,14 @@ int counter = 0;
 
 
 #define QRD_TRHESHOLD_TAPE 1000  //analog readings below 1000 if line detected 
-#define EDGE_THRESHOLD 1000
+#define EDGE_THRESHOLD 2200
 
 //adjustable constants for PID-tape
 float Kp = 0 , Ki = 0, Kd = 0, gain = 0;
 float initial_motor_speed =  0;
 
 //Adjustable constants for the initial tape following
-float i_Kp = 100, i_Ki = 0, i_Kd = 0, i_gain = 100;
+float i_Kp = 150, i_Ki = 0, i_Kd = 50, i_gain = 100;
 float i_initial_motor_speed = 25000;
 
 //Adjustable constants for the secondary tape following
@@ -123,11 +122,8 @@ void setup() {
     pinMode(MIDDLE_RIGHT_QRD, INPUT);
     pinMode(MIDDLE_LEFT_QRD, INPUT);
     pinMode(EDGE_DETECT, INPUT);
-    pinMode(RIGHT_CLAW, INPUT_PULLUP);
-    pinMode(LEFT_CLAW, INPUT_PULLUP);
-    Wire.begin();
-    //leftClawArmSetup();
-    //rightClawArmSetup();
+    pinMode(RIGHT_CLAW, INPUT_PULLDOWN);
+    pinMode(LEFT_CLAW, INPUT_PULLDOWN);
 
   pinMode(up_button, INPUT_PULLUP);
   pinMode(down_button, INPUT_PULLUP);
