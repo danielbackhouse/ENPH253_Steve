@@ -5,6 +5,10 @@
 #include <Adafruit_SSD1306.h>
 #include <EEPROM.h>
 
+//Wire Stuff for now placed here
+TwoWire WIRE2 (2,I2C_FAST_MODE);
+#define Wire WIRE2
+
 
 #define left_mb PA3 //define motor inputs
 #define left_mf PA2
@@ -121,6 +125,9 @@ void setup() {
     pinMode(EDGE_DETECT, INPUT);
     pinMode(RIGHT_CLAW, INPUT_PULLUP);
     pinMode(LEFT_CLAW, INPUT_PULLUP);
+    Wire.begin();
+    //leftClawArmSetup();
+    //rightClawArmSetup();
 
   pinMode(up_button, INPUT_PULLUP);
   pinMode(down_button, INPUT_PULLUP);
