@@ -4,6 +4,11 @@ void sensors(States stat){
             tape_sensors(stat);
             stop_sensors(stat);
             break;
+
+        case FirstGap:
+            tape_sensors(stat);
+            stop_sensors(stat);
+            break;
         case ThirdEwok:
             tape_sensors(stat);
             break;
@@ -17,22 +22,47 @@ void sensors(States stat){
 void stop_sensors(States stat){
     switch(stat){
         case FirstEwok:
-        if(digitalRead(RIGHT_CLAW)){
 
-            end_moving();
-            //right_claw_grab();
-            delay(1000);
-            state = FirstGap;
-        }
-         if(analogRead(EDGE_DETECT) > EDGE_THRESHOLD){
-             end_moving();
-             state = Stop;
-             //drop_plate();
+          if(!digitalRead(RIGHT_CLAW)){
+              end_moving();
+              rightClawGrab();
+              delay(10);
+              resetBothDist();
+              state = FirstGap;
+          }
+           else if((analogRead(EDGE_DETECT) > EDGE_THRESHOLD) && (analogRead(MIDDLE_LEFT_QRD) > EDGE_THRESHOLD) ){
+              end_moving();
+              firstGap();
+              dropPlate();
+              //   pwmWrite(left_mf, slow_speed+500);
+              // pwmWrite(left_mb, 0);
+              // pwmWrite(right_mf, slow_speed+500);
+              // pwmWrite(right_mb, 0);
+              // delay(5000);
+
+
+              state = Stop;
+              Serial1.println("Stopping!!");
+          }
+                break;
+            // Serial1.println("starting");
+             //Serial1.println("ending");
              //state = SecondEwok;
-             break;
-         }
+          case FirstGap:
+              if(analogRead(EDGE_DETECT) > EDGE_THRESHOLD ){
+              end_moving();
+              firstGap();
+              dropPlate();
+              state = SecondEwok;
+              }
+              
+               break;
+            default:
+              end_moving();
+              break;
+                    }
     }
-}
+
 void tape_sensors(States stat) {
 
 
@@ -85,3 +115,35 @@ void tape_sensors(States stat) {
        break;
   }
  }
+
+
+bool firstGapAlign(int scenario){
+  if(scenario == 1){
+    int digitalLeft = 1;
+    int digitalRight = 1;
+    bool atEdge = false;
+
+    left_qrd = analogRead(MIDDLE_LEFT_QRD);
+    right_qrd = analogRead(MIDDLE_RIGHT_QRD);
+
+    if(left_qrd < EDGE_THRESHOLD){
+      digitalLeft = 0;
+    }
+    if(right_qrd < EDGE_THRESHOLD){
+      digitalRight = 0;
+    }
+
+    if(digitalLeft && digitalRight){
+        atEdge = true;
+    }
+      return atEdge;
+    }
+
+    else if(scenario == 2){
+       if(analogRead(EDGE_DETECT) < EDGE_THRESHOLD){
+         return true;
+     }
+      return false;
+
+}
+}

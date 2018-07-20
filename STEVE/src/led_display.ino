@@ -61,6 +61,9 @@ void led_display(){
             if(var_selected == 5){
                 changeVal(&initial_motor_speed, "Speed", 100);
             }
+            if(var_selected == 6){
+                changeVal(&slow_speed, "slow", 100);
+            }
             new_screen = true;
         }
         else if(menu_level = 2){
@@ -155,7 +158,13 @@ void led_display(){
             state = Check;
         
         }
+        else if(var_selected == 5){
+            
+            delay(75);
+            encoder_readings();
         }
+        }
+
 
         var_selected = 0;
         delay(50);
@@ -201,7 +210,7 @@ void led_display(){
         break;
 
         case 1:
-        num_menu_items = 6;
+        num_menu_items = 7;
         display.setTextSize(1);
         display.setTextColor(WHITE);
         display.setCursor(7,0);
@@ -221,13 +230,15 @@ void led_display(){
         display.setCursor(6,50);
         display.print("speed = ");
         display.println(initial_motor_speed);
+        display.print("slow = ");
+        display.println(slow_speed);
         cursor = var_selected*10;
         display.setCursor(0,cursor);
         display.println("*");
         display.display();
         break;
         case 2:
-        num_menu_items = 5;
+        num_menu_items = 6;
         display.setTextSize(1);
         display.setTextColor(WHITE);
         display.setCursor(7,0);
@@ -240,6 +251,8 @@ void led_display(){
         display.println("Second Tape");
         display.setCursor(6, 40);
         display.println("Resume");
+        display.setCursor(6, 50);
+        display.println("Encoders");
         cursor = var_selected*10;
         display.setCursor(0,cursor);
         display.println("*");
@@ -356,7 +369,8 @@ void save(){
                     int gainInt = pregain;
                     EEPROM.write(3, gainInt);
                     EEPROM.write(4,i_initial_motor_speed);
-                    
+                   
+
                     preKp = s_Kp*10;
                      KpInt = preKp; 
                     EEPROM.write(5, KpInt);
@@ -370,6 +384,7 @@ void save(){
                      gainInt = pregain;
                     EEPROM.write(8, gainInt);
                     EEPROM.write(9,s_initial_motor_speed);
+                    EEPROM.write(10, slow_speed);
                    // display.println(KiInt);
                     display.display();
 
@@ -492,6 +507,7 @@ void load(){
                      pregain = EEPROM.read(8);
                     s_gain = pregain/10;
                     s_initial_motor_speed = EEPROM.read(9);
+                    slow_speed = EEPROM.read(10);
                     delay(50);
                    // display.println(KiInt);
                     display.display();
@@ -545,6 +561,54 @@ void load(){
 
 
     }
+}
+
+void encoder_readings(){
+    Serial1.println("resetting");
+    resetLeftDist();
+    resetRightDist();
+    Serial1.println("reset");
+    changing = true;
+    end_moving();
+    float Speeed;
+    int RSpeeeed;
+    float preSped;
+    int LSpeeeed;
+    pwmWrite(right_mf, 35000);
+    pwmWrite(left_mf, 35000);
+        while(changing){
+            resetRightDist();
+            resetLeftDist();
+            delay(1000);
+            getPos();
+            preSped = right_pos;
+            Speeed = 1/preSped*1000;
+            RSpeeeed = Speeed; 
+            preSped = left_pos;
+            Speeed = 1/preSped*1000; 
+            LSpeeeed = Speeed;
+
+            
+
+            changing = digitalRead(select_button);
+            display.clearDisplay();
+            display.setTextSize(1);
+            display.setTextColor(WHITE);
+            display.setCursor(0,0);
+            display.print("period = ");
+            display.println(RSpeeeed);
+            display.print("Right = ");
+            display.println(right_pos);
+            display.print("period = ");
+            display.println(LSpeeeed);
+            display.print("Right = ");
+            display.println(left_pos);
+            display.display();
+
+
+}
+
+end_moving();
 }
 void led_init(){
             // by default, we'll generate the high voltage from the 3.3v line internally! (neat!)
