@@ -29,11 +29,13 @@ void stop_sensors(States stat){
               delay(10);
               resetBothDist();
               state = FirstGap;
+              resetSlave();
           }
            else if((analogRead(EDGE_DETECT) > EDGE_THRESHOLD) && (analogRead(MIDDLE_LEFT_QRD) > EDGE_THRESHOLD) ){
               end_moving();
               firstGap();
               dropPlate();
+              resetSlave();
               //   pwmWrite(left_mf, slow_speed+500);
               // pwmWrite(left_mb, 0);
               // pwmWrite(right_mf, slow_speed+500);
@@ -53,6 +55,7 @@ void stop_sensors(States stat){
               end_moving();
               firstGap();
               dropPlate();
+              resetSlave();
               state = SecondEwok;
               }
               

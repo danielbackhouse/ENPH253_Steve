@@ -25,6 +25,7 @@ TwoWire WIRE2 (2,I2C_FAST_MODE);
 #define MIDDLE_RIGHT_QRD PA6
 #define MIDDLE_LEFT_QRD PA7
 #define EDGE_DETECT PA5 //A4 sucks
+#define SLAVE_RESET PA8
 
 #define RIGHT_CLAW PB13
 #define LEFT_CLAW PB12
@@ -126,6 +127,7 @@ void setup() {
     EEPROM.PageSize  = 0x400;
     Serial1.begin(9600);
     pinMode(LED_BUILTIN, OUTPUT);
+    pinMode(SLAVE_RESET, OUTPUT);
     pinMode(left_mb, PWM);
     pinMode(left_mf, PWM);
     pinMode(right_mb, PWM);
@@ -142,6 +144,7 @@ void setup() {
   pinMode(down_button, INPUT_PULLUP);
   pinMode(select_button, INPUT_PULLUP);
   digitalWrite(LED_BUILTIN, LOW);
+  digitalWrite(SLAVE_RESET, HIGH);
   led_init();
    // digitalWrite(LED_BUILTIN, HIGH);
   // Serial1.println("JAfd");

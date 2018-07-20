@@ -91,3 +91,9 @@ void resetBothDist(){
   Wire.write(reset_both);
   Wire.endTransmission();
 }
+
+void resetSlave(){
+  digitalWrite(SLAVE_RESET, LOW);
+  delay(50);
+  digitalWrite(SLAVE_RESET, HIGH);
+}
