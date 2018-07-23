@@ -52,18 +52,28 @@ void lowerLeftArm(){
 
 // Purpose: Controls left arm speed
 void raiseLeftArm(){
-  const int angleIncrementArm = 1;
-  const int incrementDelayArm = 15;
-    for (int angle = leftArmDown; angle <= leftArmUp; angle += angleIncrementArm) { 
-      left_arm_servo.write(angle);
-      delay (incrementDelayArm); // incrementDelayArm * (ArmUpAngle - ArmDownAngle) = 15 * (150-0) = 2.25 seconds
-    }
+
+  left_arm_servo.write(120);
+  left_claw_servo.write(leftClawClose);
+
+  trigger = 0;
+  done = true;
+
+  // const int angleIncrementArm = 1;
+  // const int incrementDelayArm = 5;
+  // trigger = 0;
+  // done = true;
+
+  //   for (int angle = leftArmDown; angle <= leftArmUp; angle += angleIncrementArm) { 
+  //     left_arm_servo.write(angle);
+  //     delay (incrementDelayArm); // incrementDelayArm * (ArmUpAngle - ArmDownAngle) = 15 * (150-0) = 2.25 seconds
+  //   }
   
 }
 
 // Purpose: Commands left side to follow pickup sequence
 void pickupRight(){
-    Serial1.println("Picking up thing");
+    //Serial1.println("Picking up thing");
 
   right_claw_servo.write(rightClawClose);
   delay(clawCloseDelay);
@@ -79,12 +89,13 @@ void pickupRight(){
 // Purpose: Controls left claw speed
 void openRightClaw(){
   
-  const int angleIncrementClaw = 1;
-  const int incrementDelayClaw = 10;
-    for (int angle = rightClawClose; angle <= rightClawOpen; angle += angleIncrementClaw) { 
-      right_claw_servo.write(angle);
-      delay (incrementDelayClaw); // incrementDelayArm * (ArmUpAngle - ArmDownAngle) = 15 * (150-0) = 2.25 seconds
-    }
+  // const int angleIncrementClaw = 1;
+  // const int incrementDelayClaw = 1;
+  //   for (int angle = rightClawClose; angle <= rightClawOpen; angle += angleIncrementClaw) { 
+  //     right_claw_servo.write(angle);
+  //     delay (incrementDelayClaw); // incrementDelayArm * (ArmUpAngle - ArmDownAngle) = 10 * (150-0) = 1.5 seconds
+  //   }
+  right_claw_servo.write(150);
 }
 
 // Purpose: Controls left arm speed

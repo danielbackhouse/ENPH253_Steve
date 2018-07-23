@@ -4,7 +4,7 @@
 #include <ext_interrupts.h>
 
 #define PLATE_DROP_SERVO PB1
-#define LEFT_ARM_SERVO PA3
+#define LEFT_ARM_SERVO PA6
 #define LEFT_CLAW_SERVO PB0
 #define RIGHT_ARM_SERVO PA3
 #define RIGHT_CLAW_SERVO PA2
@@ -24,7 +24,7 @@ Servo bucket_servo;
 
 // Right Contact Pin, Right Claw Pin and Servo Angles
 const int rightClawClose = 10;
-const int rightClawOpen = 150; 
+const int rightClawOpen = 140; 
 
 // Right Arm Pin and Servo Angles;
 const int rightArmDown = 180;
@@ -34,7 +34,7 @@ const int rightArmUp = 30;
 // int leftContact = PB13;
 // int leftClawPin = PB7;
 const int leftClawClose = 180;
-const int leftClawOpen = 40;
+const int leftClawOpen = 60;
 
 // Left Arm Pin and Servo Angles
 // int leftArmPin = PB6;
@@ -139,6 +139,9 @@ void requestEvent() {
   }
   else {   
       Wire1.write(done);
+      if(done == true){
+          position = true;
+      }
   }
 
 }
@@ -163,8 +166,8 @@ void receiveEvent(int howmany){
 void loop()
 {
 
-    Serial1.println(left_pos);
-    Serial1.println(right_pos);
+    // Serial1.println(left_pos);
+    // Serial1.println(right_pos);
     switch (trigger){
 
         case 0:
@@ -187,8 +190,8 @@ void loop()
         break;
 
         case left_claw_lift_trig:
-        //clawLift(left);
-        break;
+            raiseLeftArm();
+            break;
 
         case bucket_trig:
         bucketDrop();
@@ -203,10 +206,10 @@ void loop()
 
 void dropPlate(){
     delay(1000);
-    Serial1.println("In loop");
+   // Serial1.println("In loop");
     plate_drop_servo.write(180);
     delay(500);
-    Serial1.println("Servo moved!");
+    //Serial1.println("Servo moved!");
     trigger = 0;
     done = true;
 }
