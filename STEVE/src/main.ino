@@ -52,7 +52,7 @@ int counter = 0;
 //adjustable constants for PID-tape
 float Kp = 0 , Ki = 0, Kd = 0, gain = 0;
 float initial_motor_speed =  0;
-float slow_speed = 23500;
+float slow_speed = 26000;
 
 unsigned long timeIs;
 unsigned long lastTime = 0;
@@ -60,11 +60,11 @@ int timeDelay = 1000;
 
 //Adjustable constants for the initial tape following
 float i_Kp = 150, i_Ki = 0, i_Kd = 50, i_gain = 100;
-float i_initial_motor_speed = 26500;
+float i_initial_motor_speed = 28000;
 
 //Adjustable constants for the secondary tape following
 float s_Kp = 100, s_Ki = 0, s_Kd = 0, s_gain = 100;
-float s_initial_motor_speed = 26000;
+float s_initial_motor_speed = 26300;
 //Global variables for PID-Tape
 float error = 0, P = 0, I = 0, D = 0, PID_value = 0;
 float previous_error = 0, previous_I = 0;
@@ -190,7 +190,7 @@ void loop() {
         pid();
         break;
       case SecondEwok:
-      Serial1.println("Second case");
+     // Serial1.println("Second case");
         sensors(SecondEwok);
         pid();
         break;
@@ -224,4 +224,9 @@ void check(){
   state = FirstEwok;
   Kp = i_Kp, Kd = i_Kd, Ki = i_Ki, gain = i_gain;
   initial_motor_speed = i_initial_motor_speed;
+}
+
+void reset_error(){
+   error = 0, P = 0, I = 0, D = 0, PID_value = 0;
+ previous_error = 0, previous_I = 0;
 }

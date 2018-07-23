@@ -12,6 +12,11 @@ void sensors(States stat){
         case ThirdEwok:
             tape_sensors(stat);
             break;
+
+        case SecondEwok:
+          stop_sensors(stat);
+          tape_sensors(stat);
+          break;
         default:
           break;
 
@@ -29,13 +34,14 @@ void stop_sensors(States stat){
               delay(10);
               resetBothDist();
               state = FirstGap;
-              resetSlave();
+              //resetSlave();
+              Serial1.println("Grabbed ewok");
           }
            else if((analogRead(EDGE_DETECT) > EDGE_THRESHOLD) && (analogRead(MIDDLE_LEFT_QRD) > EDGE_THRESHOLD) ){
               end_moving();
               firstGap();
               dropPlate();
-              resetSlave();
+              //resetSlave();
               //   pwmWrite(left_mf, slow_speed+500);
               // pwmWrite(left_mb, 0);
               // pwmWrite(right_mf, slow_speed+500);
@@ -51,20 +57,87 @@ void stop_sensors(States stat){
              //Serial1.println("ending");
              //state = SecondEwok;
           case FirstGap:
+            Serial1.println("First gap");
               if(analogRead(EDGE_DETECT) > EDGE_THRESHOLD ){
               end_moving();
               firstGap();
+              Serial1.println("Gapping");
+              delay(500);
+
               dropPlate();
-              resetSlave();
+
+              raiseLeftArm();
+
+              //Serial1.println("Dropping duh plate");
+              //resetSlave();
+              pwmWrite(left_mf, slow_speed);
+              pwmWrite(left_mb, 0);
+              pwmWrite(right_mf, slow_speed);
+              pwmWrite(right_mb, 0);
+              delay(200);
+              // pwmWrite(left_mf, slow_speed+500);
+              // pwmWrite(left_mb, 0);
+              // pwmWrite(right_mf, 0);
+              // pwmWrite(right_mb, 0);
+              // delay(1000);
+              // end_moving();
+              bool foundTape = false;
+              bool once = false;
+              while(!foundTape){
+                if(!once){
+                once = isTape(stat);
+
+                }
+                else{
+                  foundTape = isTape(stat);
+                }
+              
+                delay(10);
+              }
+
+              //end_moving();
               state = SecondEwok;
+              initial_motor_speed = s_initial_motor_speed;
+               reset_error();
+
               }
               
                break;
+            case SecondEwok:
+                if(!digitalRead(RIGHT_CLAW)){
+                    end_moving();
+                    rightClawGrab();
+                    delay(10);
+                    resetBothDist();
+                    state = FirstGap;
+                    //resetSlave();
+                    Serial1.println("Grabbed ewok");
+                    state = Stop;
+                }
+                
+                break;
             default:
               end_moving();
               break;
                     }
     }
+
+bool isTape(States stat){
+  int digitalLeft = 1;
+  int digitalRight = 1;
+  if(stat != 99){
+    left_qrd = analogRead(INITIAL_LEFT_QRD);
+    right_qrd = analogRead(INITIAL_RIGHT_QRD);
+  }
+    if(left_qrd > QRD_TRHESHOLD_TAPE){
+      return true;
+  }
+  if(right_qrd > QRD_TRHESHOLD_TAPE){
+return true;  
+}
+
+return false;
+}
 
 void tape_sensors(States stat) {
 

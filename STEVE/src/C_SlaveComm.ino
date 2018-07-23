@@ -51,6 +51,27 @@ void rightClawGrab(){
   Serial1.println("Done");
 
 }
+void raiseLeftArm(){
+  Wire.beginTransmission(4);
+  Wire.write(left_claw_lift_trig);
+
+  Wire.endTransmission();
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(300);
+    digitalWrite(LED_BUILTIN, HIGH);
+
+  Serial1.println("Picking up left arm");
+
+  while (done == false){
+    delay(100);
+    Wire.requestFrom(4, 1);
+    while (Wire.available()){
+      done = Wire.read();
+    }
+  }
+  done = false;
+
+}
 void getPos(){
   byte a, b, c, d, e, f, g, h;
 
