@@ -67,33 +67,37 @@ void stop_sensors(States stat){
               dropPlate();
 
               raiseLeftArm();
+                  
+              // **** Cross Gap function    
+              crossGap();
 
               //Serial1.println("Dropping duh plate");
               //resetSlave();
-              pwmWrite(left_mf, slow_speed);
-              pwmWrite(left_mb, 0);
-              pwmWrite(right_mf, slow_speed);
-              pwmWrite(right_mb, 0);
-              delay(200);
+              //pwmWrite(left_mf, slow_speed);
+              //pwmWrite(left_mb, 0);
+              //pwmWrite(right_mf, slow_speed);
+              //pwmWrite(right_mb, 0);
+              //delay(200);
               // pwmWrite(left_mf, slow_speed+500);
               // pwmWrite(left_mb, 0);
               // pwmWrite(right_mf, 0);
               // pwmWrite(right_mb, 0);
               // delay(1000);
               // end_moving();
-              bool foundTape = false;
-              bool once = false;
-              while(!foundTape){
-                if(!once){
-                once = isTape(stat);
+                  
+             // bool foundTape = false;
+             // bool once = false;
+             // while(!foundTape){
+             //  if(!once){
+             //   once = isTape(stat);
 
-                }
-                else{
-                  foundTape = isTape(stat);
-                }
+             //  }
+             //   else{
+             //     foundTape = isTape(stat);
+             //   }
               
-                delay(10);
-              }
+             //   delay(10);
+             // }
 
               //end_moving();
               state = SecondEwok;
@@ -221,5 +225,31 @@ bool firstGapAlign(int scenario){
      }
       return false;
 
+    }
 }
+
+void crossGap(){
+    while(right_pos < 50 && left_pos < 50);
+        
+    end_moving();
+    delay(50);
+    
+    while(right_pos < 90 && left_pos < 90){
+        pwmWrite(left_mf, slow_speed);
+        pwmWrite(left_mb, 0);
+        pwmWrite(right_mf, slow speed);
+        pwmWrite(right_mb, 0);
+    }
+    
+    end_moving();
+    delay(50);
+    
+    while(!isTape(stat)){
+        pwmWrite(left_mf, slow_speed);
+        pwmWrite(left_mb, 0);
+        pwmWrite(right_mf,0);
+        pwmWrite(right_mb, 0);
+    }
+    
+    end_moving();
 }
