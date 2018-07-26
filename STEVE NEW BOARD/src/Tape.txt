@@ -1,0 +1,12 @@
+#ifndef TAPE_H
+#define TAPE_H
+
+class PID  
+{
+    public:
+        PID();
+        int high(String pin);
+        int low(String pin);
+};
+
+#endif //TAPE_H
