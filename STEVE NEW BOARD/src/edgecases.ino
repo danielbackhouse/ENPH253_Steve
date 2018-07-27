@@ -4,9 +4,9 @@ void firstGap(){
     pwmWrite(left_mb, slow_speed);
     pwmWrite(right_mf, 0);
     pwmWrite(right_mb, slow_speed);
-    Serial1.println("At first gap");
+    Serial.println("At first gap");
     delay(50);
-    //end_moving();
+    end_moving();
     while(!atEdge){
         atEdge = firstGapAlign(1);
         //goForward();  //with encoders
@@ -21,9 +21,9 @@ void firstGap(){
     pwmWrite(right_mf, 0);
     pwmWrite(right_mb, slow_speed);
     delay(50);
-    //end_moving();
+    end_moving();
 
-    Serial1.println("Far enough");
+    Serial.println("Far enough");
     atEdge = false;
     while(!atEdge){
         atEdge = firstGapAlign(2);
@@ -36,7 +36,7 @@ void firstGap(){
     pwmWrite(left_mf, slow_speed);
     
     atEdge = false;
-    Serial1.println("At first gap");
+    Serial.println("At first gap");
     delay(50);
     // while(!atEdge){
     //     atEdge = firstGapAlign(1);
@@ -74,30 +74,22 @@ void firstGap(){
             }
         }
         
-        Serial1.println("stop movement");
+        Serial.println("stop movement");
         end_moving();
-        delay(1000);
-        pwmWrite(right_mf, 19000);
-        pwmWrite(left_mf, 19000);
-        delay(50);
-        end_moving();
+        delay(100);
 
 
-
-        // pwmWrite(left_mf, 0);
-        // pwmWrite(left_mb, slow_speed+500);
-        // pwmWrite(right_mf, 0);
-        // pwmWrite(right_mb, slow_speed+500);
-        // delay(450);
-        //end_moving();
 }
 
 void crossFirstBridge(States stat){
+    Serial.println("crossing first gap");
     resetBothDist();
     lastTime = millis();
+    getPos();
     while(right_pos < 50 && left_pos < 60){
-        sensors(stat);
+        sensors(JustTape);
         pid();
+        Serial.println("Daniel!");
         timeIs = millis();
         if(timeIs > (lastTime + 100)){
             lastTime = millis();
@@ -106,13 +98,7 @@ void crossFirstBridge(States stat){
 
         
     }
-        
-    display.clearDisplay();
-    display.setTextSize(1);
-    display.setTextColor(WHITE);
-    display.setCursor(0,0);
-    display.println("Done following");
-    display.display();
+    Serial.println("Jeremy!");
     end_moving();
     //delay(1000);
     lastTime = millis();
@@ -143,16 +129,12 @@ void crossFirstBridge(States stat){
             getPos();
         }
     }
-        display.clearDisplay();
-    display.setTextSize(1);
-    display.setTextColor(WHITE);
-    display.setCursor(0,0);
-    display.println("Done forward");
-    display.display();
     
     end_moving();
     delay(50);
     state = SecondEwok;
+    
+    Serial.println("jeremy wiens1");
     //stat = state;
     bool skipSearch = false;
     lastTime = millis();
@@ -160,14 +142,6 @@ void crossFirstBridge(States stat){
      getPos();
     int initialTime = millis();
     timeIs = millis();
-    // display.clearDisplay();
-    // display.setTextSize(1);
-    // display.setTextColor(WHITE);
-    // display.setCursor(0,0);
-    // display.println(right_pos);
-    // display.display();
-    //delay(1000);
-
     while(!skipSearch && right_pos < 30 && (timeIs < (initialTime + 2000)) ){
         skipSearch = isTape(SecondEwok);
         pwmWrite(left_mf, 0);
@@ -246,4 +220,72 @@ void claws(){
 
     }
     
+}
+
+void reposition() {
+    int rightTurnDist = 30;
+    int leftTurnDist = 20;
+    int backUpDist = 5;
+    resetBothDist();
+    while(right_pos < backUpDist && left_pos < backUpDist){   //check reverse distances here!
+            getPos();
+
+            if(left_pos < backUpDist){
+                pwmWrite(left_mb, slow_speed);
+            }
+            else{
+                pwmWrite(left_mb, 0);
+                pwmWrite(left_mf, 1000);
+            }
+            if(right_pos < backUpDist){
+                pwmWrite(right_mb, slow_speed);
+            }
+            else{
+                pwmWrite(right_mb, 0);
+                pwmWrite(right_mf, 1000);
+            }
+        }
+
+    resetBothDist();
+    while(right_pos < rightTurnDist || left_pos < leftTurnDist){
+
+        if(left_pos < leftTurnDist){
+            pwmWrite(left_mf, slow_speed/2);
+            pwmWrite(left_mb, 0);
+        }
+        else{
+            pwmWrite(left_mb, 1000);
+            pwmWrite(left_mf, 0);
+        }
+        if(right_pos < rightTurnDist){
+            pwmWrite(right_mb, slow_speed);
+            pwmWrite(right_mf, 0);
+        }
+        else{
+            pwmWrite(right_mb, 0);
+            pwmWrite(right_mf, 1000);
+        }
+    }
+
+    while (!digitalRead(RIGHT_BUMPER) && !digitalRead(LEFT_BUMPER)){
+        pwmWrite(right_mb, slow_speed);
+        pwmWrite(right_mf, 0);
+        pwmWrite(left_mb, slow_speed);
+        pwmWrite(left_mf, 0);
+
+        if (!digitalRead(RIGHT_BUMPER)){
+            pwmWrite(left_mb, slow_speed);
+            pwmWrite(left_mf, 0);
+            pwmWrite(right_mb, 0);
+            pwmWrite(right_mf, 1000);
+        }
+
+        if (!digitalRead(LEFT_BUMPER)){
+            pwmWrite(left_mb, 0);
+            pwmWrite(left_mf, 1000);
+            pwmWrite(right_mb, slow_speed);
+            pwmWrite(right_mf, 0);
+        }
+    }
+
 }

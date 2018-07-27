@@ -15,16 +15,11 @@ void sensors(States stat){
           break;
 
         case ThirdEwok:
-            stop_sensors(stat);
-    //               display.clearDisplay();
-    // display.setTextSize(1);
-    // display.setTextColor(WHITE);
-    // display.setCursor(0,0);
-    // display.println(testVal);
-    // display.display();
-               // Serial1.println("gettuing tape");
-
+          stop_sensors(stat);
           tape_sensors(stat);
+          break;
+        case JustTape:
+          tape_sensors(JustTape);
           break;
         default:
           break;
@@ -44,7 +39,6 @@ void stop_sensors(States stat){
               resetBothDist();
               state = FirstGap;
               //resetSlave();
-              Serial1.println("Grabbed ewok");
           }
            else if((analogRead(EDGE_DETECT) > EDGE_THRESHOLD) && (analogRead(MIDDLE_LEFT_QRD) > EDGE_THRESHOLD) ){
               end_moving();
@@ -59,25 +53,26 @@ void stop_sensors(States stat){
 
 
               state = Stop;
-              Serial1.println("Stopping!!");
+              Serial.println("Stopping!!");
           }
                 break;
-            // Serial1.println("starting");
-             //Serial1.println("ending");
+            // Serial.println("starting");
+             //Serial.println("ending");
              //state = SecondEwok;
           case FirstGap:
-            Serial1.println("First gap");
+           // Serial.println("First gap");
               if(analogRead(EDGE_DETECT) > EDGE_THRESHOLD ){
               end_moving();
               firstGap();
-              Serial1.println("Gapping");
-              delay(500);
+              //Serial.println("Gapping");
+              delay(100);
 
               dropPlate();
-              delay(100);
+              delay(400);
+              Serial.println("dropped plate");
               raiseLeftArm();
 
-              Serial1.println("Dropping duh plate");
+              Serial.println("Dropping duh plate");
               //resetSlave();
               pwmWrite(left_mf, slow_speed);
               pwmWrite(left_mb, 0);
@@ -103,16 +98,9 @@ void stop_sensors(States stat){
               
                 //delay(10);
               }
-
-              display.clearDisplay();
-            display.setTextSize(1);
-            display.setTextColor(WHITE);
-            display.setCursor(0,0);
-            display.println("Found Tape");
-            display.display();
               reset_error();
               
-
+              Serial.println("Crossing bridge");
               crossFirstBridge(stat);
               end_moving();
 
@@ -120,6 +108,7 @@ void stop_sensors(States stat){
               initial_motor_speed = s_initial_motor_speed;
                reset_error();
                state = SecondEwok;
+               Serial.println("second Ewok");
                max_PWM = 30000;
 
               }
@@ -127,7 +116,6 @@ void stop_sensors(States stat){
                break;
             case SecondEwok:
                 if(!digitalRead(RIGHT_CLAW)){
-
 
                     end_moving();
                     pwmWrite(left_mb, 18000);
@@ -138,7 +126,7 @@ void stop_sensors(States stat){
                     delay(10);
                     resetBothDist();
                     //resetSlave();
-                    Serial1.println("Grabbed ewok");
+                    Serial.println("Grabbed ewok");
                     state = ThirdEwok;
                     timeDelay = 100;
                     max_PWM = 39000;
@@ -165,7 +153,7 @@ void stop_sensors(States stat){
                 pwmWrite(left_mb, 19000);
                 delay(50);
                 end_moving();
-                leftClawGrab;
+                leftClawGrab();
                 state = Stop;
               }
               break;
@@ -205,7 +193,7 @@ void tape_sensors(States stat) {
 
   int digitalLeft = 1;
   int digitalRight = 1;
-  if(stat == FirstGap || stat == FirstEwok){
+  if(stat == FirstGap || stat == FirstEwok || stat == JustTape){
     left_qrd = analogRead(INITIAL_LEFT_QRD);
     right_qrd = analogRead(INITIAL_RIGHT_QRD);
   }

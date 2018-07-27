@@ -12,7 +12,7 @@ int left_pos = 0;
 int right_pos = 0;
 
 //Wire Stuff for now placed here
-TwoWire WIRE2 (2,I2C_FAST_MODE);
+TwoWire WIRE2 (2, I2C_FAST_MODE);
 #define Wire WIRE2
 
 #define left_mb PA3 //define motor inputs
@@ -30,8 +30,11 @@ TwoWire WIRE2 (2,I2C_FAST_MODE);
 #define RIGHT_CLAW PB13
 #define LEFT_CLAW PB12
 
+#define RIGHT_BUMPER PB15
+#define LEFT_BUMPER PB14
+
 enum States{
-  Check, FirstEwok, FirstGap, SecondEwok, IR, ThirdEwok, Dump, Stop, TestInitial, TestSecond
+  Check, FirstEwok, FirstGap, SecondEwok, IR, ThirdEwok, Dump, Stop, TestInitial, TestSecond, JustTape
   };
 
 int state = Check;
@@ -127,7 +130,7 @@ void setup() {
     EEPROM.PageBase0 = 0x801F000;
     EEPROM.PageBase1 = 0x801F800;
     EEPROM.PageSize  = 0x400;
-    Serial1.begin(9600);
+    Serial.begin(115200);
     pinMode(LED_BUILTIN, OUTPUT);
     pinMode(SLAVE_RESET, OUTPUT);
     pinMode(left_mb, PWM);
@@ -141,22 +144,20 @@ void setup() {
     pinMode(EDGE_DETECT, INPUT);
     pinMode(RIGHT_CLAW, INPUT_PULLUP);
     pinMode(LEFT_CLAW, INPUT_PULLUP);
+    pinMode(RIGHT_BUMPER, INPUT_PULLUP);
+    pinMode(LEFT_BUMPER, INPUT_PULLUP);
   Wire.begin();
   pinMode(up_button, INPUT_PULLUP);
   pinMode(down_button, INPUT_PULLUP);
   pinMode(select_button, INPUT_PULLUP);
   digitalWrite(LED_BUILTIN, LOW);
-  digitalWrite(SLAVE_RESET, HIGH);
   led_init();
    // digitalWrite(LED_BUILTIN, HIGH);
-  // Serial1.println("JAfd");
+  // Serial.println("JAfd");
 }
 
 void loop() {
-//Serial1.println(left_pos);
-
-//getPos();
-//Serial1.println(right_pos);
+Serial.println(state);
 
      if(!showing_display){
          show_display = !digitalRead(select_button);
@@ -175,7 +176,6 @@ void loop() {
         getEncoder(FirstEwok);
 
     }
-    Serial1.println(state);
           switch (state){
       case Check:
         check();
@@ -183,17 +183,16 @@ void loop() {
         digitalWrite(LED_BUILTIN, HIGH);
         break;
       case FirstEwok:
-      Serial1.println("First case");
+      Serial.println("First case");
         sensors(FirstEwok);
         pid();
         break;
       case FirstGap:
-        Serial1.println("First gap");
+       // Serial.println("First gap");
         sensors(FirstGap);
         pid();
         break;
       case SecondEwok:
-     // Serial1.println("Second case");
         sensors(SecondEwok);
         pid();
         break;
@@ -205,6 +204,12 @@ void loop() {
       case Stop:
         end_moving();
         break;
+
+      case Dump:
+        reposition();
+        bucketDump();
+      break;
+
       case TestInitial:
         test_initial();
         break;
@@ -214,7 +219,6 @@ void loop() {
       default:
         end_moving();
         break;
-
 
     }
     }
