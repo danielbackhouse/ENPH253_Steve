@@ -26,25 +26,25 @@ Servo bucket_servo;
 
 // Right Contact Pin, Right Claw Pin and Servo Angles
 const int rightClawClose = 0;
-const int rightClawOpen = 120; 
+const int rightClawOpen = 150; 
 
 // Right Arm Pin and Servo Angles;
 const int rightArmDown = 180;
 const int rightArmUp = 10;
 const int rightArmMid = 110;
-const int rightArmArch = 40;
+const int rightArmArch = 20;
 
 // Left Contact Pin, Left Claw Pin and Servo Angles
 // int leftContact = PB13;
 // int leftClawPin = PB7;
 const int leftClawClose = 180;
-const int leftClawOpen = 40;
+const int leftClawOpen = 0;
 
 // Left Arm Pin and Servo Angles
 // int leftArmPin = PB6;
 const int leftArmDown = 0;
 const int leftArmUp = 160;
-const int leftArmMid = 80;
+const int leftArmMid = 60;
 const int leftArmPlate = 95;
 const int leftArmArch = 140;
 
@@ -118,15 +118,11 @@ void requestEvent() {
     Wire1.write(leftArray, 4);
     Wire1.write(rightArray, 4);
   }
-  else if (received == false){
-      Wire1.write(trigger);
-      received = true;
-  }
   else {   
       Wire1.write(send);
       if(send != 0){
           position = true;
-          received = false;
+        //   received = false;
       }
   }
 
