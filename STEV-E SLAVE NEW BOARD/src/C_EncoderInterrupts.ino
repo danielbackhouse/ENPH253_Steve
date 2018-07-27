@@ -15,17 +15,3 @@ void left_interrupt()
         left_count = 0;
     }
 }
-
-double getRightDistance() {
-    return right_dist;
-}
-
-void resetRightDist() {
-    right_pos = 0;
-    right_dist = 0;
-}
-
-void resetLeftDist() {
-    left_pos = 0;
-    left_dist = 0;
-}
